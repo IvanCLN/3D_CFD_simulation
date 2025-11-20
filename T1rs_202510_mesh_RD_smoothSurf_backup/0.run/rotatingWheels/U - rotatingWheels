@@ -1,0 +1,76 @@
+/*--------------------------------*- C++ -*----------------------------------*\
+  =========                 |
+  \\      /  F ield         | OpenFOAM: The Open Source CFD Toolbox
+   \\    /   O peration     | Website:  https://openfoam.org
+    \\  /    A nd           | Version:  11
+     \\/     M anipulation  |
+\*---------------------------------------------------------------------------*/
+FoamFile
+{
+    format      ascii;
+    class       volVectorField;
+    location    "0";
+    object      U;
+}
+// * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * //
+
+#include        "include/initialConditions"
+
+dimensions      [0 1 -1 0 0 0 0];
+
+internalField   uniform $flowVelocity;
+
+boundaryField
+{
+    //- Set patchGroups for constraint patches
+    #includeEtc "caseDicts/setConstraintTypes"
+
+    #include "include/fixedInlet"
+
+    outlet
+    {
+        type            inletOutlet;
+        inletValue      uniform (0 0 0);
+        value           $internalField;
+    }
+	
+    // Total moving ground 
+    lowerWall 
+    {
+    type movingWallVelocity;
+   	value $internalField;
+    }
+
+ // front wheel & mozzo
+    "(.*front_wheel_wall)"  	//"(front_wheel_wall|mozzi_front_wheel_wall)"
+    {
+        type rotatingWallVelocity;
+        origin     (0.5865991834555754 0.072 0.019999838268494223);	//estrarre da ansa l'origine dell'asse di rotazione   
+
+        axis	     (0 0 -1); //estrarre da ansa l'asse di rotazione
+        omega	     $wheelsOmega;
+    }	
+		
+	// rear wheel & mozzo & pignone
+    "(.*rear_wheel_wall)"  		//"(rear_wheel_wall|mozzi_rear_wheel_wall|pignoni_rear_wheel_wall)"
+    {
+        type rotatingWallVelocity;
+       origin     (-0.4015969855248766 0.07199997816112747 0.01924759355046797);	//estrarre da ansa l'origine dell'asse di rotazione 
+
+        axis	     (0 0 -1); //estrarre da ansa l'asse di rotazione
+        omega	     $wheelsOmega;
+    }
+	
+	// elements
+	"(.*saddle.*|.*handlebar.*|.*fork.*|.*frame.*|.*gears.*|.*controls.*|.*bottle.*)"						//"(.*wall)"  	//"(handlebar_wall|saddle_wall|frame_wall)"
+    {
+        type            noSlip;
+    }
+
+
+
+    #include "include/Domain"
+}
+
+
+// ************************************************************************* //

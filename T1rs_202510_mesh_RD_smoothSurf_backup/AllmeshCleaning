@@ -1,0 +1,20 @@
+#!/bin/sh
+#cd ${0%/*} || exit 1    # Run from this directory
+
+# Source tutorial run functions
+#. $WM_PROJECT_DIR/bin/tools/RunFunctions
+#nCORES=32
+
+
+echo "---Reordering 0 folder---"
+mv 0/ 0.mesh/
+mv 0.run/ 0/
+echo "---Selecting only Region 0---"
+subsetMesh region0 -overwrite >log.subsetMesh 2>&1
+echo "---Running checkMesh---"
+checkMesh -latestTime >log.checkMesh2 2>&1
+echo "---Reordering 0 folder---"
+mv 0/ 0.run/
+mv 0.mesh/ 0/
+
+#------------------------------------------------------------------------------

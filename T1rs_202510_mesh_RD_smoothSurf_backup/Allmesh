@@ -1,0 +1,35 @@
+#!/bin/sh
+#cd ${0%/*} || exit 1    # Run from this directory
+echo "---Running Allclean---"
+./Allclean
+# Source tutorial run functions
+. $WM_PROJECT_DIR/bin/tools/RunFunctions
+
+nCORES=32
+
+echo "---Running surfaceTransformPoints---"
+surfaceTransformPoints "scale=(1e-3 1e-3 1e-3)" constant/triSurface/T1rs_mm.stl constant/triSurface/T1rs_M_Rz.stl >log.scale 2>&1
+surfaceTransformPoints "Ry=-180" constant/triSurface/T1rs_M_Rz.stl constant/triSurface/T1rs_M.stl >log.rotate_y 2>&1
+echo "---Running blockMesh---"
+blockMesh >log.blockMesh 2>&1
+
+echo "---Running surfaceFeatures---"
+surfaceFeatures >log.surfaceFeatures 2>&1
+echo "---Running decomposePar---"
+decomposePar >log.decomposePar 2>&1
+echo "---Running snappyHexMesh---"
+mpirun -n $nCORES snappyHexMesh -parallel -overwrite >log.snappyHexMesh 2>&1
+
+#echo "---Running checkMesh---"
+#mpirun -n $nCORES checkMesh -parallel -latestTime >log.checkMesh 2>&1
+#echo "---Running reconstructParMesh---"
+#reconstructParMesh -constant >log.reconstructParMesh 2>&1
+
+#echo "---Cleaning Mesh---"
+#./AllmeshCleaning
+echo "---Running paraFoam---"
+paraFoam -touch -builtin
+#echo "---Running patchSummary---"
+#patchSummary >log.patchSummary 2>&1
+
+#------------------------------------------------------------------------------

@@ -1,0 +1,14 @@
+#!/bin/sh
+cd ${0%/*} || exit 1    # Run from this directory
+
+# Clean time directories only
+
+rm -r constant/polyMesh
+rm -r constant/triSurface/T1rs_M.eMesh
+rm -r constant/extendedFeatureEdgeMesh
+#rm -r constant/triSurface/NACA0012_3d.stl
+rm -r processor*
+rm -f log.*
+rm -r T1rs_20250909.foam
+
+#------------------------------------------------------------------------------

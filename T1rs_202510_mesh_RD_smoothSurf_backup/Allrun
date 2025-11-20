@@ -1,0 +1,31 @@
+#!/bin/sh
+#cd ${0%/*} || exit 1    # Run from this directory
+./AllcleanRun
+# Source tutorial run functions
+. $WM_PROJECT_DIR/bin/tools/RunFunctions
+
+nCORES=32
+echo "---Reordering 0 folder---"
+mv 0/ 0.mesh/
+mv 0.run/ 0/
+#echo "---Deleting old processors---"
+#rm -r processor* 2>&1
+
+echo "---Running decomposePar---"
+decomposePar >log.decomposePar2 2>&1
+echo "---Running checkMesh---"
+mpirun -n $nCORES checkMesh -parallel -latestTime >log.checkMesh_run 2>&1
+echo "---Running renumberMesh---"
+mpirun -n $nCORES renumberMesh -overwrite -parallel >log.renumberMesh 2>&1
+echo "---Running potentialFoam---"
+mpirun -n $nCORES potentialFoam -parallel >log.potentialFoam 2>&1
+echo "---Running simpleFoam---"
+mpirun -n $nCORES simpleFoam -parallel >log.simpleFoam 2>&1
+echo "---Running paraFoam---"
+paraFoam -touch -builtin
+
+echo "---Reordering 0 folder---"
+mv 0/ 0.run/
+mv 0.mesh/ 0/
+
+#------------------------------------------------------------------------------
