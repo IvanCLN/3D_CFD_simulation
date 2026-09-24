@@ -1,0 +1,58 @@
+#!/bin/sh
+#cd ${0%/*} || exit 1    # Run from this directory
+echo "---Running Allclean---"
+./Allclean
+# Source tutorial run functions
+. $WM_PROJECT_DIR/bin/tools/RunFunctions
+
+nCORES=32
+
+echo "---Running surfaceTransformPoints---"
+
+surfaceTransformPoints "scale=(1e-3 1e-3 1e-3)" constant/triSurface/frame_wall.stl constant/triSurface/frame_wall_Sc.stl >log.scale_0 2>&1
+surfaceTransformPoints "Ry=-180" constant/triSurface/frame_wall_Sc.stl constant/triSurface/frame_wall_M.stl >log.rotate_y_0 2>&1
+#surfaceTransformPoints "Rz=-90" constant/triSurface/frame_wall_Ry.stl constant/triSurface/frame_wall_M.stl >log.rotate_z_0 2>&1
+
+surfaceTransformPoints "scale=(1e-3 1e-3 1e-3)" constant/triSurface/fork_wall.stl constant/triSurface/fork_wall_Sc.stl >log.scale_1 2>&1
+surfaceTransformPoints "Ry=-180" constant/triSurface/fork_wall_Sc.stl constant/triSurface/fork_wall_M.stl >log.rotate_y_1 2>&1
+#surfaceTransformPoints "Rz=-90" constant/triSurface/fork_wall_Ry.stl constant/triSurface/fork_wall_M.stl >log.rotate_z_1 2>&1
+
+surfaceTransformPoints "scale=(1e-3 1e-3 1e-3)" constant/triSurface/crankset_wall.stl constant/triSurface/crankset_wall_Sc.stl >log.scale_21 2>&1
+surfaceTransformPoints "Ry=-180" constant/triSurface/crankset_wall_Sc.stl constant/triSurface/crankset_wall_M.stl >log.rotate_y_2 2>&1
+#surfaceTransformPoints "Rz=-90" constant/triSurface/crankset_wall_Ry.stl constant/triSurface/crankset_wall_M.stl >log.rotate_z_2 2>&1
+
+surfaceTransformPoints "scale=(1e-3 1e-3 1e-3)" constant/triSurface/handlebar_wall.stl constant/triSurface/handlebar_wall_Sc.stl >log.scale_3 2>&1
+surfaceTransformPoints "Ry=-180" constant/triSurface/handlebar_wall_Sc.stl constant/triSurface/handlebar_wall_M.stl >log.rotate_y_3 2>&1
+#surfaceTransformPoints "Rz=-90" constant/triSurface/handlebar_wall_Ry.stl constant/triSurface/handlebar_wall_M.stl >log.rotate_z_3 2>&1
+
+surfaceTransformPoints "scale=(1e-3 1e-3 1e-3)" constant/triSurface/seatpost_wall.stl constant/triSurface/seatpost_wall_Sc.stl >log.scale_4 2>&1
+surfaceTransformPoints "Ry=-180" constant/triSurface/seatpost_wall_Sc.stl constant/triSurface/seatpost_wall_M.stl >log.rotate_y_4 2>&1
+#surfaceTransformPoints "Rz=-90" constant/triSurface/seatpost_wall_Ry.stl constant/triSurface/seatpost_wall_M.stl >log.rotate_z_4 2>&1
+
+surfaceTransformPoints "scale=(1e-3 1e-3 1e-3)" constant/triSurface/rear_wheel.stl constant/triSurface/rear_wheel_Sc.stl >log.scale_5 2>&1
+surfaceTransformPoints "Ry=-180" constant/triSurface/rear_wheel_Sc.stl constant/triSurface/rear_wheel_M.stl >log.rotate_y_5 2>&1
+#surfaceTransformPoints "Rz=-90" constant/triSurface/rear_wheel_Ry.stl constant/triSurface/rear_wheel_M.stl >log.rotate_z_5 2>&1
+
+surfaceTransformPoints "scale=(1e-3 1e-3 1e-3)" constant/triSurface/front_wheel.stl constant/triSurface/front_wheel_Sc.stl >log.scale_6 2>&1
+surfaceTransformPoints "Ry=-180" constant/triSurface/front_wheel_Sc.stl constant/triSurface/front_wheel_M.stl >log.rotate_y_6 2>&1
+#surfaceTransformPoints "Rz=-90" constant/triSurface/front_wheel_Ry.stl constant/triSurface/front_wheel_M.stl >log.rotate_z_6 2>&1
+
+
+echo "---Running blockMesh---"
+blockMesh >log.blockMesh 2>&1
+
+echo "---Running surfaceFeatures---"
+surfaceFeatures >log.surfaceFeatures 2>&1
+echo "---Running decomposePar---"
+decomposePar >log.decomposePar 2>&1
+echo "---Running snappyHexMesh---"
+mpirun -n $nCORES snappyHexMesh -parallel -overwrite >log.snappyHexMesh 2>&1
+
+#echo "---Cleaning Mesh---"
+./AllmeshCleaning
+echo "---Running paraFoam---"
+paraFoam -touch -builtin
+#echo "---Running patchSummary---"
+#patchSummary >log.patchSummary 2>&1
+
+#------------------------------------------------------------------------------

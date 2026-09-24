@@ -1,0 +1,13 @@
+#!/bin/sh
+cd ${0%/*} || exit 1    # Run from this directory
+
+# Clean time directories only
+
+echo "---Deleting old processors---"
+rm -r processor*
+echo "---Deleting log.files---"
+rm log.decomposePar2*
+rm log.renumberMesh*
+rm log.potentialFoam**
+rm log.simpleFoam*
+#------------------------------------------------------------------------------

@@ -1,0 +1,21 @@
+#!/bin/sh
+#cd ${0%/*} || exit 1    # Run from this directory
+
+# Source tutorial run functions
+#. $WM_PROJECT_DIR/bin/tools/RunFunctions
+nCORES=32
+mpirun -n $nCORES subsetMesh region0 -parallel -overwrite -noFields >log.subsetMesh 2>&1
+
+#for proc in processor*/; do
+#    echo "Cleaning $proc"
+#    
+#    find "${proc}constant/polyMesh/sets/" \
+#        -maxdepth 1 \
+#        -type f \
+#        -name 'region*' \
+#        ! -name 'region0' \
+#        -delete
+#done
+
+
+#------------------------------------------------------------------------------
